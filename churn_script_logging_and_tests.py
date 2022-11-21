@@ -31,6 +31,17 @@ def test_eda(perform_eda):
 	'''
 	test perform eda function
 	'''
+	try:
+		assert os.path.exists('./images/eda/churn_hist.png')
+		assert os.path.exists('./images/eda/Customer_Age.png')
+		assert os.path.exists('./images/eda/Marital_Status.png')
+		assert os.path.exists('./images/eda/Total_Trans_Ct.png')
+		assert os.path.exists('./images/eda/heatmap.png')
+		logging.info("Testing perform_eda: SUCCESS")
+	except AssertionError as err:
+		logging.error("Testing perform_eda: image files don't appear to be generated")
+		raise err
+
 
 
 def test_encoder_helper(encoder_helper):
