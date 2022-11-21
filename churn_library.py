@@ -1,8 +1,14 @@
 # library doc string
+"""
+Library for churn_notebook
+Author: Mark
 
+Date: Nov 2022
+"""
 
 # import libraries
 import os
+import pandas as pd
 os.environ['QT_QPA_PLATFORM']='offscreen'
 
 
@@ -15,8 +21,9 @@ def import_data(pth):
             pth: a path to the csv
     output:
             df: pandas dataframe
-    '''	
-	pass
+    '''
+    df = pd.read_csv(pth)
+    return df
 
 
 def perform_eda(df):
