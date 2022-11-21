@@ -28,7 +28,7 @@ def test_import():
 		raise err
 
 
-def test_eda(perform_eda):
+def test_eda():
 	'''
 	test perform eda function
 	'''
@@ -65,11 +65,4 @@ def test_train_models(train_models):
 
 if __name__ == "__main__":
 	test_import()
-
-
-
-
-
-
-
-
+	test_eda()

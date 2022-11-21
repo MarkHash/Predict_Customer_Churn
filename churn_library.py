@@ -24,8 +24,7 @@ def import_data(pth):
     output:
             df: pandas dataframe
     '''
-    df = pd.read_csv(pth)
-    return df
+    return pd.read_csv(pth)
 
 
 def perform_eda(df):
@@ -40,36 +39,29 @@ def perform_eda(df):
     df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
     
     # histgram of churn
-    plt.figure(figsize=(20,10))
     df['Churn'].hist()
     plt.savefig('./images/eda/churn_hist.png')
     plt.close('churn_hist.png')
 
     # histogram of Customer_Age
-    plt.figure(figsize=(20,10))
     df['Customer_Age'].hist()
     plt.savefig('./images/eda/Customer_Age.png')
     plt.close('Customer_Age.png')
 
     # histogram of Marital_Status
-    plt.figure(figsize=(20,10))
     df['Marital_Status'].value_counts('normalize').plot(kind='bar')
     plt.savefig('./images/eda/Marital_Status.png')
     plt.close('Marital_Status.png')
 
     # histogram of Total_Trans_Ct
-    plt.figure(figsize=(20,10))
     sns.histplot(df['Total_Trans_Ct'], stat='density', kde=True)
     plt.savefig('./images/eda/Total_Trans_Ct.png')
     plt.close('Total_Trans_Ct.png')
 
     # heatmap
-    plt.figure(figsize=(20,10))
     sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
-    plt.show()
     plt.savefig('./images/eda/heatmap.png')
     plt.close('heatmap.png')
-
 
 def encoder_helper(df, category_lst, response):
     '''
@@ -150,4 +142,5 @@ def train_models(X_train, X_test, y_train, y_test):
     pass
 
 if __name__ == "__main__":
-        import_data("./data/bank_data.csv")
+        df = import_data("./data/bank_data.csv")
+        perform_eda(df)
