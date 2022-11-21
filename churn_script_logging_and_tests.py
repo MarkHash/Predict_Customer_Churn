@@ -1,6 +1,7 @@
 import os
 import logging
-import churn_library_solution as cls
+import churn_library as clib
+# import churn_library_solution as cls
 
 logging.basicConfig(
     filename='./logs/churn_library.log',
@@ -8,12 +9,12 @@ logging.basicConfig(
     filemode='w',
     format='%(name)s - %(levelname)s - %(message)s')
 
-def test_import(import_data):
+def test_import():
 	'''
 	test data import - this example is completed for you to assist with the other test functions
 	'''
 	try:
-		df = import_data("./data/bank_data.csv")
+		df = clib.import_data("./data/bank_data.csv")
 		logging.info("Testing import_data: SUCCESS")
 	except FileNotFoundError as err:
 		logging.error("Testing import_eda: The file wasn't found")
@@ -52,7 +53,7 @@ def test_train_models(train_models):
 
 
 if __name__ == "__main__":
-	pass
+	test_import()
 
 
 
