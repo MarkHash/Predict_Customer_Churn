@@ -148,3 +148,6 @@ def train_models(X_train, X_test, y_train, y_test):
               None
     '''
     pass
+
+if __name__ == "__main__":
+        import_data("./data/bank_data.csv")
