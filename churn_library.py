@@ -76,7 +76,16 @@ def encoder_helper(df, category_lst, response):
     output:
             df: pandas dataframe with new columns for
     '''
-    pass
+    for category_name in category_lst:
+        lst = []
+        column_name = category_name + response
+        category_groups = df.groupby(category_name).mean()['Churn']
+        for val in df[category_name]:
+            lst.append(category_groups.loc[val])
+
+        df[column_name] = lst
+    return df
+
 
 
 def perform_feature_engineering(df, response):
@@ -142,5 +151,14 @@ def train_models(X_train, X_test, y_train, y_test):
     pass
 
 if __name__ == "__main__":
+        cat_columns = [
+                'Gender',
+                'Education_Level',
+                'Marital_Status',
+                'Income_Category',
+                'Card_Category'
+                ]
+        column_post_fix = '_Churn'
         df = import_data("./data/bank_data.csv")
         perform_eda(df)
+        encoder_helper(df, cat_columns, column_post_fix)

@@ -11,7 +11,7 @@ logging.basicConfig(
 
 def test_import():
 	'''
-	test data import - this example is completed for you to assist with the other test functions
+	test data import - function to test perform_eda() function
 	'''
 	try:
 		df = clib.import_data("./data/bank_data.csv")
@@ -23,16 +23,18 @@ def test_import():
 	try:
 		assert df.shape[0] > 0
 		assert df.shape[1] > 0
+		return df
 	except AssertionError as err:
 		logging.error("Testing import_data: The file doesn't appear to have rows and columns")
 		raise err
 
 
-def test_eda():
+def test_eda(df):
 	'''
-	test perform eda function
+	test perform eda function - function to test import_data() function
 	'''
 	try:
+		clib.perform_eda(df)
 		assert os.path.exists('./images/eda/churn_hist.png')
 		assert os.path.exists('./images/eda/Customer_Age.png')
 		assert os.path.exists('./images/eda/Marital_Status.png')
@@ -45,24 +47,40 @@ def test_eda():
 
 
 
-def test_encoder_helper(encoder_helper):
+def test_encoder_helper(df, category_lst, response):
 	'''
-	test encoder helper
+	test encoder helper - function to test encoder_helper() function
 	'''
-
+	try:
+		encoded_df = clib.encoder_helper(df, category_lst, response)
+		original_df = clib.import_data("./data/bank_data.csv")
+		print("{} {} {}".format(len(encoded_df.columns), len(original_df.columns), len(category_lst)))
+		assert (len(encoded_df.columns) == (len(original_df.columns) + len(category_lst) + 1))
+		logging.info("Testing encoder_helper: SUCCESS")
+	except AssertionError as err:
+		logging.error("Testing encoder_helper: The dataframe doesn't appear to have additional encoded columns")
 
 def test_perform_feature_engineering(perform_feature_engineering):
 	'''
-	test perform_feature_engineering
+	test perform_feature_engineering - function to test perform_feature_engineering() function
 	'''
 
 
 def test_train_models(train_models):
 	'''
-	test train_models
+	test train_models - function to test train_models() function
 	'''
 
 
 if __name__ == "__main__":
-	test_import()
-	test_eda()
+	cat_columns = [
+                'Gender',
+                'Education_Level',
+                'Marital_Status',
+                'Income_Category',
+                'Card_Category'
+                ]
+	column_post_fix = '_Churn'
+	df = test_import()
+	test_eda(df)
+	test_encoder_helper(df, cat_columns, column_post_fix)
