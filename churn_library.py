@@ -8,10 +8,16 @@ Date: Nov 2022
 
 # import libraries
 import os
+import joblib
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import plot_roc_curve
+
 os.environ['QT_QPA_PLATFORM']='offscreen'
 
 
@@ -156,7 +162,36 @@ def train_models(X_train, X_test, y_train, y_test):
     output:
               None
     '''
-    pass
+    rfc = RandomForestClassifier(random_state=42)
+    lrc = LogisticRegression(solver='lbfgs', max_iter=3000)
+    param_grid = {
+        'n_estimators': [200, 500],
+        'max_features': ['auto', 'sqrt'],
+        'max_depth' : [4,5,100],
+        'criterion' :['gini', 'entropy']
+    }
+    cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid)
+    cv_rfc.fit(X_train, y_train)
+    lrc.fit(X_train, y_train)
+
+    # save the best model
+    joblib.dump(cv_rfc.best_estimator_, './models/rfc_model.pkl')
+    joblib.dump(lrc, './models/logistic_model.pkl')
+
+    # prediction
+    y_train_preds_rf = cv_rfc.best_estimator_.predict(X_train)
+    y_test_preds_rf = cv_rfc.best_estimator_.predict(X_test)
+    y_train_preds_lr = lrc.predict(X_train)
+    y_test_preds_lr = lrc.predict(X_test)
+
+    # plot the results
+    plt.figure(figsize=(15, 8))
+    ax = plt.gca()
+    lrc_plot = plot_roc_curve(lrc, X_test, y_test)
+    rfc_disp = plot_roc_curve(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
+    lrc_plot.plot(ax=ax, alpha=0.8)
+    plt.savefig('./images/results/plot_roc_curve.png')
+    plt.close('plot_roc_curve.png')
 
 if __name__ == "__main__":
         cat_columns = [
@@ -191,3 +226,4 @@ if __name__ == "__main__":
         perform_eda(df)
         df = encoder_helper(df, cat_columns, column_post_fix)
         X_train, X_test, y_train, y_test = perform_feature_engineering(df, keep_cols, 'Churn')
+        train_models(X_train, X_test, y_train, y_test)
