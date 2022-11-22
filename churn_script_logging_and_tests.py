@@ -59,11 +59,22 @@ def test_encoder_helper(df, category_lst, response):
 		logging.info("Testing encoder_helper: SUCCESS")
 	except AssertionError as err:
 		logging.error("Testing encoder_helper: The dataframe doesn't appear to have additional encoded columns")
+		raise err
 
-def test_perform_feature_engineering(perform_feature_engineering):
+def test_perform_feature_engineering(df, cols, response):
 	'''
 	test perform_feature_engineering - function to test perform_feature_engineering() function
 	'''
+	try:
+		X_train, X_test, y_train, y_test = clib.perform_feature_engineering(df, cols, response)
+		assert X_train.shape[0] > 0
+		assert X_test.shape[0] > 0
+		assert y_train.shape[0] > 0
+		assert y_test.shape[0] > 0
+		logging.info("Testing perform_feature_engineering: SUCCESS")
+	except AssertionError as err:
+		logging.error("Testing perform_feature_engineering: The dataframes appear to be empty")
+		raise err
 
 
 def test_train_models(train_models):
@@ -74,13 +85,33 @@ def test_train_models(train_models):
 
 if __name__ == "__main__":
 	cat_columns = [
-                'Gender',
-                'Education_Level',
-                'Marital_Status',
-                'Income_Category',
-                'Card_Category'
+		'Gender',
+		'Education_Level',
+		'Marital_Status',
+		'Income_Category',
+		'Card_Category'
                 ]
-	column_post_fix = '_Churn'
+	keep_cols = [
+		'Customer_Age',
+		'Dependent_count',
+		'Months_on_book',
+		'Total_Relationship_Count', 'Months_Inactive_12_mon',
+		'Contacts_Count_12_mon',
+		'Credit_Limit',
+		'Total_Revolving_Bal',
+		'Avg_Open_To_Buy',
+		'Total_Amt_Chng_Q4_Q1',
+		'Total_Trans_Amt',
+		'Total_Trans_Ct',
+		'Total_Ct_Chng_Q4_Q1',
+		'Avg_Utilization_Ratio',
+		'Gender_Churn',
+		'Education_Level_Churn',
+		'Marital_Status_Churn',
+		'Income_Category_Churn',
+		'Card_Category_Churn'
+		]
 	df = test_import()
 	test_eda(df)
-	test_encoder_helper(df, cat_columns, column_post_fix)
+	test_encoder_helper(df, cat_columns, '_Churn')
+	test_perform_feature_engineering(df, keep_cols, 'Churn')
