@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import plot_roc_curve
+from sklearn.metrics import plot_roc_curve, classification_report
 
 os.environ['QT_QPA_PLATFORM']='offscreen'
 
@@ -116,12 +116,7 @@ def perform_feature_engineering(df, cols, response):
     return X_train, X_test, y_train, y_test
 
 
-def classification_report_image(y_train,
-                                y_test,
-                                y_train_preds_lr,
-                                y_train_preds_rf,
-                                y_test_preds_lr,
-                                y_test_preds_rf):
+def classification_report_image(y_train, y_test, y_train_preds, y_test_preds, model_name, output_pth):
     '''
     produces classification report for training and testing results and stores report as image
     in images folder
@@ -136,7 +131,21 @@ def classification_report_image(y_train,
     output:
              None
     '''
-    pass
+    file_name = model_name + ".png"
+    plt.rc('figure', figsize=(5, 5))
+    
+    # train data report
+    plt.text(0.01, 1.25, str(model_name + ' Train'), {'fontsize': 10}, fontproperties='monospace')
+    plt.text(0.01, 0.05, str(classification_report(y_train, y_train_preds)), {'fontsize': 10}, fontproperties='monospace')
+
+    # test data report
+    plt.text(0.01, 0.6, str(model_name + ' Test'), {'fontsize': 10}, fontproperties='monospace')
+    plt.text(0.01, 0.7, str(classification_report(y_test, y_test_preds)), {'fontsize': 10}, fontproperties='monospace')
+    
+    plt.axis('off')
+    plt.savefig(output_pth + file_name)
+    plt.close(file_name)
+    plt.clf()
 
 
 def feature_importance_plot(model, X_data, output_pth):
@@ -150,6 +159,7 @@ def feature_importance_plot(model, X_data, output_pth):
     output:
              None
     '''
+    file_name = "feature_importance.png"
     importances = model.feature_importances_
     indices = np.argsort(importances)[::-1]
     names = [X_data.columns[i] for i in indices]
@@ -160,8 +170,9 @@ def feature_importance_plot(model, X_data, output_pth):
     plt.ylabel("Importance")
     plt.bar(range(X_data.shape[1]), importances[indices])
     plt.xticks(range(X_data.shape[1]), names, rotation=90)
-    plt.savefig(output_pth)
-    plt.close(output_pth)
+    plt.savefig(output_pth + file_name)
+    plt.close(file_name)
+    plt.clf()
 
 def train_models(X_train, X_test, y_train, y_test):
     '''
@@ -196,11 +207,12 @@ def train_models(X_train, X_test, y_train, y_test):
     y_train_preds_lr = lrc.predict(X_train)
     y_test_preds_lr = lrc.predict(X_test)
 
-    # plot the results
+    # plot the roc curve
     plt.figure(figsize=(15, 8))
     ax = plt.gca()
     lrc_plot = plot_roc_curve(lrc, X_test, y_test)
     rfc_disp = plot_roc_curve(cv_rfc.best_estimator_, X_test, y_test, ax=ax, alpha=0.8)
+    lrc_plot.plot(ax=ax, alpha=0.8)
     plt.savefig('./images/results/roc_curve.png')
     plt.close('roc_curve.png')
 
@@ -239,6 +251,23 @@ if __name__ == "__main__":
         X_train, X_test, y_train, y_test = perform_feature_engineering(df, keep_cols, 'Churn')
         train_models(X_train, X_test, y_train, y_test)
         rfc_model = joblib.load('./models/rfc_model.pkl')
+        lrc_model = joblib.load('./models/logistic_model.pkl')
         X_data = pd.DataFrame()
         X_data[keep_cols] = df[keep_cols]
-        feature_importance_plot(rfc_model, X_data, "./images/results/feature_importance.png")
+        feature_importance_plot(rfc_model, X_data, "./images/results/")
+        y_train_preds_rf = rfc_model.predict(X_train)
+        y_test_preds_rf = rfc_model.predict(X_test)
+        y_train_preds_lr = lrc_model.predict(X_train)
+        y_test_preds_lr = lrc_model.predict(X_test)
+        classification_report_image(y_train,
+                y_test,
+                y_train_preds_rf,
+                y_test_preds_rf,
+                "Random_Forest",
+                "./images/results/")
+        classification_report_image(y_train,
+                y_test,
+                y_train_preds_lr,
+                y_test_preds_lr,
+                "Logistic_Regression",
+                "./images/results/")
