@@ -72,16 +72,25 @@ def test_perform_feature_engineering(df, cols, response):
 		assert y_train.shape[0] > 0
 		assert y_test.shape[0] > 0
 		logging.info("Testing perform_feature_engineering: SUCCESS")
+		return X_train, X_test, y_train, y_test
 	except AssertionError as err:
 		logging.error("Testing perform_feature_engineering: The dataframes appear to be empty")
 		raise err
 
 
-def test_train_models(train_models):
+def test_train_models(X_train, X_test, y_train, y_test):
 	'''
 	test train_models - function to test train_models() function
 	'''
-
+	try:
+		clib.train_models(X_train, X_test, y_train, y_test)
+		assert os.path.exists('./images/results/plot_roc_curve.png')
+		assert os.path.exists('./models/rfc_model.pkl')
+		assert os.path.exists('./models/logistic_model.pkl')
+		logging.info("Testing train_models: SUCCESS")
+	except AssertionError as err:
+		logging.error("Testing train_models: model and/or image files don't appear to be generated")
+		raise err
 
 if __name__ == "__main__":
 	cat_columns = [
@@ -114,4 +123,5 @@ if __name__ == "__main__":
 	df = test_import()
 	test_eda(df)
 	test_encoder_helper(df, cat_columns, '_Churn')
-	test_perform_feature_engineering(df, keep_cols, 'Churn')
+	X_train, X_test, y_train, y_test = test_perform_feature_engineering(df, keep_cols, 'Churn')
+	test_train_models(X_train, X_test, y_train, y_test)
