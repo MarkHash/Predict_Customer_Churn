@@ -54,7 +54,6 @@ def test_encoder_helper(df, category_lst, response):
 	try:
 		encoded_df = clib.encoder_helper(df, category_lst, response)
 		original_df = clib.import_data("./data/bank_data.csv")
-		print("{} {} {}".format(len(encoded_df.columns), len(original_df.columns), len(category_lst)))
 		assert (len(encoded_df.columns) == (len(original_df.columns) + len(category_lst) + 1))
 		logging.info("Testing encoder_helper: SUCCESS")
 	except AssertionError as err:
@@ -84,7 +83,10 @@ def test_train_models(X_train, X_test, y_train, y_test):
 	'''
 	try:
 		clib.train_models(X_train, X_test, y_train, y_test)
-		assert os.path.exists('./images/results/plot_roc_curve.png')
+		assert os.path.exists('./images/results/roc_curve.png')
+		assert os.path.exists('./images/results/feature_importance.png')
+		assert os.path.exists('./images/results/Random_Forest.png')
+		assert os.path.exists('./images/results/Logistic_Regression.png')
 		assert os.path.exists('./models/rfc_model.pkl')
 		assert os.path.exists('./models/logistic_model.pkl')
 		logging.info("Testing train_models: SUCCESS")

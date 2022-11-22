@@ -257,24 +257,3 @@ if __name__ == "__main__":
         df = encoder_helper(df, cat_columns, column_post_fix)
         X_train, X_test, y_train, y_test = perform_feature_engineering(df, keep_cols, 'Churn')
         train_models(X_train, X_test, y_train, y_test)
-        # rfc_model = joblib.load('./models/rfc_model.pkl')
-        # lrc_model = joblib.load('./models/logistic_model.pkl')
-        # X_data = pd.DataFrame()
-        # X_data[keep_cols] = df[keep_cols]
-        # feature_importance_plot(rfc_model, X_data, "./images/results/")
-        # y_train_preds_rf = rfc_model.predict(X_train)
-        # y_test_preds_rf = rfc_model.predict(X_test)
-        # y_train_preds_lr = lrc_model.predict(X_train)
-        # y_test_preds_lr = lrc_model.predict(X_test)
-        # classification_report_image(y_train,
-        #         y_test,
-        #         y_train_preds_rf,
-        #         y_test_preds_rf,
-        #         "Random_Forest",
-        #         "./images/results/")
-        # classification_report_image(y_train,
-        #         y_test,
-        #         y_train_preds_lr,
-        #         y_test_preds_lr,
-        #         "Logistic_Regression",
-        #         "./images/results/")
