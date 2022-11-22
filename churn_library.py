@@ -11,6 +11,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
+from sklearn.model_selection import train_test_split
 os.environ['QT_QPA_PLATFORM']='offscreen'
 
 
@@ -88,10 +89,11 @@ def encoder_helper(df, category_lst, response):
 
 
 
-def perform_feature_engineering(df, response):
+def perform_feature_engineering(df, cols, response):
     '''
     input:
               df: pandas dataframe
+              cols: list of columns that will be kept for model training
               response: string of response name [optional argument that could be used for naming variables or index y column]
 
     output:
@@ -100,6 +102,12 @@ def perform_feature_engineering(df, response):
               y_train: y training data
               y_test: y testing data
     '''
+    X = pd.DataFrame()
+    X[cols] = df[cols]
+    y = df[response]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    return X_train, X_test, y_train, y_test
+
 
 def classification_report_image(y_train,
                                 y_test,
@@ -159,6 +167,27 @@ if __name__ == "__main__":
                 'Card_Category'
                 ]
         column_post_fix = '_Churn'
+        keep_cols = [
+                'Customer_Age',
+                'Dependent_count',
+                'Months_on_book',
+                'Total_Relationship_Count', 'Months_Inactive_12_mon',
+                'Contacts_Count_12_mon',
+                'Credit_Limit',
+                'Total_Revolving_Bal',
+                'Avg_Open_To_Buy',
+                'Total_Amt_Chng_Q4_Q1',
+                'Total_Trans_Amt',
+                'Total_Trans_Ct',
+                'Total_Ct_Chng_Q4_Q1',
+                'Avg_Utilization_Ratio',
+                'Gender_Churn',
+                'Education_Level_Churn',
+                'Marital_Status_Churn',
+                'Income_Category_Churn',
+                'Card_Category_Churn'
+                ]
         df = import_data("./data/bank_data.csv")
         perform_eda(df)
-        encoder_helper(df, cat_columns, column_post_fix)
+        df = encoder_helper(df, cat_columns, column_post_fix)
+        X_train, X_test, y_train, y_test = perform_feature_engineering(df, keep_cols, 'Churn')
