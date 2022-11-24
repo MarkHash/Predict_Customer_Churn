@@ -1,8 +1,15 @@
+"""
+This module is Unit tests for churn_library module and produce logs any INFO and ERROR into churn_library.log
+Author: Mark
+
+Date: Nov 2022
+"""
 import os
 import logging
 import churn_library as clib
 # import churn_library_solution as cls
 
+# Basic logging configuration
 logging.basicConfig(
     filename='./logs/churn_library.log',
     level=logging.INFO,
@@ -13,8 +20,13 @@ logging.basicConfig(
 def test_import():
     '''
     test data import - function to test perform_eda() function
+		input:
+				None
+		output:
+				None
     '''
     try:
+        # import csv file and create dataframe
         df = clib.import_data("./data/bank_data.csv")
         logging.info("Testing import_data: SUCCESS")
     except FileNotFoundError as err:
@@ -34,8 +46,13 @@ def test_import():
 def test_eda(dataframe):
     '''
     test perform eda function - function to test import_data() function
+        input:
+            dataframe: dataframe to perform eda
+    	output:
+            None
     '''
     try:
+        # check eda results (image files)
         clib.perform_eda(dataframe)
         assert os.path.exists('./images/eda/churn_hist.png')
         assert os.path.exists('./images/eda/Customer_Age.png')
@@ -52,10 +69,21 @@ def test_eda(dataframe):
 def test_encoder_helper(dataframe, category_lst, response):
     '''
     test encoder helper - function to test encoder_helper() function
+        input:
+            dataframe: pandas dataframe
+            category_lst: list of columns that contain categorical features
+            response: string of response name
+    	output:
+            None
     '''
     try:
-        encoded_dataframe = clib.encoder_helper(dataframe, category_lst, response)
+        # check the number of columns in new dataframe with encoded columns
+        encoded_dataframe = clib.encoder_helper(
+            dataframe, category_lst, response)
         original_dataframe = clib.import_data("./data/bank_data.csv")
+
+        # number of columns should be (original_dataframe: 22, category_lst: 5,
+        # 1: ['Churn'])
         assert (len(encoded_dataframe.columns) == (
             len(original_dataframe.columns) + len(category_lst) + 1))
         logging.info("Testing encoder_helper: SUCCESS")
@@ -68,8 +96,19 @@ def test_encoder_helper(dataframe, category_lst, response):
 def test_perform_feature_engineering(dataframe, cols, response):
     '''
     test perform_feature_engineering - function to test perform_feature_engineering() function
+        input:
+              dataframe: pandas dataframe
+              cols: list of columns that will be kept for model training
+              response: string of response name
+
+    	output:
+              X_train: X training data
+              X_test: X testing data
+              y_train: y training data
+              y_test: y testing data
     '''
     try:
+        # check training, test data is correctly split
         X_train, X_test, y_train, y_test = clib.perform_feature_engineering(
             dataframe, cols, response)
         assert X_train.shape[0] > 0
@@ -87,8 +126,16 @@ def test_perform_feature_engineering(dataframe, cols, response):
 def test_train_models(X_train, X_test, y_train, y_test):
     '''
     test train_models - function to test train_models() function
+    	input:
+              X_train: X training data
+              X_test: X testing data
+              y_train: y training data
+              y_test: y testing data
+        output:
+              None
     '''
     try:
+        # check if the result image data is generated
         clib.train_models(X_train, X_test, y_train, y_test)
         assert os.path.exists('./images/results/roc_curve.png')
         assert os.path.exists('./images/results/feature_importance.png')

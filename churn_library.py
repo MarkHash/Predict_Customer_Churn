@@ -1,6 +1,5 @@
-# library doc string
 """
-Library for churn_notebook
+This module for Library to identify credit card customers who will likely to chrun by a model with RandomForestClassifier and LogisticRegression.
 Author: Mark
 
 Date: Nov 2022
@@ -44,6 +43,7 @@ def perform_eda(dataframe):
     output:
             None
     '''
+    # Create Churn column for classification
     dataframe['Churn'] = dataframe['Attrition_Flag'].apply(
         lambda val: 0 if val == "Existing Customer" else 1)
 
@@ -86,6 +86,7 @@ def encoder_helper(dataframe, category_lst, response):
     output:
             dataframe: pandas dataframe with new columns for
     '''
+    # create new columns with churn percentage for each category
     for category_name in category_lst:
         lst = []
         column_name = category_name + response
@@ -99,6 +100,7 @@ def encoder_helper(dataframe, category_lst, response):
 
 def perform_feature_engineering(dataframe, cols, response):
     '''
+    Create a dataframe with features that will be used for model engineering
     input:
               dataframe: pandas dataframe
               cols: list of columns that will be kept for model training
@@ -113,6 +115,8 @@ def perform_feature_engineering(dataframe, cols, response):
     X_dataframe = pd.DataFrame()
     X_dataframe[cols] = dataframe[cols]
     y_dataframe = dataframe[response]
+
+    # Split the data for train and test
     X_train, X_test, y_train, y_test = train_test_split(
         X_dataframe, y_dataframe, test_size=0.3, random_state=42)
     return X_train, X_test, y_train, y_test
@@ -120,8 +124,7 @@ def perform_feature_engineering(dataframe, cols, response):
 
 def classification_report_image(y_train, y_test, y_train_preds, y_test_preds, model_name):
     '''
-    produces classification report for training and testing results and stores report as image
-    in images folder
+    produces classification report for training and testing results and stores report as image in images folder
     input:
             y_train: training response values
             y_test:  test response values
@@ -137,7 +140,7 @@ def classification_report_image(y_train, y_test, y_train_preds, y_test_preds, mo
     file_name = model_name + ".png"
     plt.rc('figure', figsize=(5, 5))
 
-    # train data report
+    # report for train data
     plt.text(0.01, 1.25, str(model_name + ' Train'),
              {'fontsize': 10}, fontproperties='monospace')
     plt.text(
@@ -146,7 +149,7 @@ def classification_report_image(y_train, y_test, y_train_preds, y_test_preds, mo
                 y_train, y_train_preds)), {
             'fontsize': 10}, fontproperties='monospace')
 
-    # test data report
+    # report for test data
     plt.text(0.01, 0.6, str(model_name + ' Test'),
              {'fontsize': 10}, fontproperties='monospace')
     plt.text(
@@ -173,6 +176,8 @@ def feature_importance_plot(model, X_data, output_pth):
              None
     '''
     file_name = "feature_importance.png"
+
+    # feature importance
     importances = model.feature_importances_
     indices = np.argsort(importances)[::-1]
     names = [X_data.columns[i] for i in indices]
@@ -199,14 +204,17 @@ def train_models(X_train, X_test, y_train, y_test):
     output:
               None
     '''
+    # model object
     rfc = RandomForestClassifier(random_state=42)
     lrc = LogisticRegression(solver='lbfgs', max_iter=3000)
+    # parameter to explore forRandomForestClassifier
     param_grid = {
         'n_estimators': [200, 500],
         'max_features': ['auto', 'sqrt'],
         'max_depth': [4, 5, 100],
         'criterion': ['gini', 'entropy']
     }
+    # perform cross validation
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid)
     cv_rfc.fit(X_train, y_train)
     lrc.fit(X_train, y_train)
