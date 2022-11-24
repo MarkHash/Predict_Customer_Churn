@@ -7,6 +7,8 @@ This project provides a machine learning model that identify credit card custome
 
 ## Files and data description
 This project consists of the following files
+
+```
 .
 ├── Guide.ipynb          # Getting started and troubleshooting tips
 ├── churn_notebook.ipynb # Contains the code to be refactored
@@ -22,16 +24,15 @@ This project consists of the following files
 ├── models               # Model artifact
 ├── requirements_py3.6.txt
 └── requirements_py3.8.txt
+```
 
 ## Running Files
 Follow the steps below to run this project
 
-```
 1. Clone the repository: `git clone https://github.com/MarkHash/Predict_Customer_Churn.git`
 2. Create virtual python environment: `python -m venv env/` `source env/bin/activate`
 3. Install dependencies: `python -m pip install -r requirements_py3.6.txt`
  or `python -m pip install -r requirements_py3.8.txt`
 4. Run this project: `ipython churn_library.py`
 5. Run unit test code: `ipython churn_script_logging_and_tests.py`
-```
 
